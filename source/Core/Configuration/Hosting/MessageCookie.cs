@@ -228,7 +228,7 @@ namespace Thinktecture.IdentityServer.Core.Configuration.Hosting
                     orderby rank descending
                     select name;
 
-                var purge = rankedCookieNames.Skip(toKeep);
+                var purge = rankedCookieNames.Skip(Math.Max(0, toKeep-1));
                 foreach (var name in purge)
                 {
                     ClearByCookieName(name);

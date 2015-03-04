@@ -416,9 +416,8 @@ namespace Thinktecture.IdentityServer.Tests.Endpoints
         [Fact]
         public void GetLogin_SigninMessageThresholdSetToX_GetLoginMoreThanXTimesOnlyLatestXMessagesAreKept()
         {
-            const int signInThreshold = 3;
-            const int moreThanSignInThreshold = signInThreshold + 1;
-            options.AuthenticationOptions.SignInMessageThreshold = signInThreshold;
+            options.AuthenticationOptions.SignInMessageThreshold = 3;
+            var moreThanSignInThreshold = options.AuthenticationOptions.SignInMessageThreshold + 1;
 
             for (var i = 0; i < moreThanSignInThreshold; i++)
             {
@@ -426,11 +425,26 @@ namespace Thinktecture.IdentityServer.Tests.Endpoints
             }
 
             var theNextRequest = GetLoginPage();
-            theNextRequest.RequestMessage
-                .Headers.GetValues("Cookie")
+            theNextRequest.RequestMessage.Headers
+                .GetValues("Cookie")
                 .Count(c => c.StartsWith("SignInMessage."))
                 .Should()
-                .Be(signInThreshold);
+                .Be(options.AuthenticationOptions.SignInMessageThreshold);
+        }
+
+        [Fact]
+        public void GetLogin_SigninMessageThresholdSetToZero_OneSignInMessageKept()
+        {
+            options.AuthenticationOptions.SignInMessageThreshold = 0;
+
+            GetLoginPage();
+
+            var theNextRequest = GetLoginPage();
+            theNextRequest.RequestMessage.Headers
+                .GetValues("Cookie")
+                .Count(c => c.StartsWith("SignInMessage."))
+                .Should()
+                .Be(1);
         }
 
         [Fact]
