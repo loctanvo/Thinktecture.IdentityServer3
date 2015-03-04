@@ -414,6 +414,26 @@ namespace Thinktecture.IdentityServer.Tests.Endpoints
         }
 
         [Fact]
+        public void GetLogin_SigninMessageThresholdSetToX_GetLoginMoreThanXTimesOnlyLatestXMessagesAreKept()
+        {
+            const int signInThreshold = 3;
+            const int moreThanSignInThreshold = signInThreshold + 1;
+            options.AuthenticationOptions.SignInMessageThreshold = signInThreshold;
+
+            for (var i = 0; i < moreThanSignInThreshold; i++)
+            {
+                GetLoginPage();
+            }
+
+            var theNextRequest = GetLoginPage();
+            theNextRequest.RequestMessage
+                .Headers.GetValues("Cookie")
+                .Count(c => c.StartsWith("SignInMessage."))
+                .Should()
+                .Be(signInThreshold);
+        }
+
+        [Fact]
         public void PostToLogin_ClientEnableLocalLoginFalse_Fails()
         {
             var url = GetLoginPage().GetModel<LoginViewModel>().LoginUrl;

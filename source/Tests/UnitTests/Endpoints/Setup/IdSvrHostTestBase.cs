@@ -247,7 +247,14 @@ namespace Thinktecture.IdentityServer.Tests.Endpoints
         protected string WriteMessageToCookie<T>(T msg)
             where T : Message
         {
-            var request_headers = new Dictionary<string, string[]>();
+            var cookieStates = client.DefaultRequestHeaders.GetCookies().SelectMany(c => c.Cookies);
+            
+            var requestCookies = cookieStates.Select(c => c.ToString()).ToArray();
+
+            var request_headers = new Dictionary<string, string[]>
+            {
+                {"Cookie", requestCookies}
+            };
             var response_headers = new Dictionary<string, string[]>();
             var env = new Dictionary<string, object>()
             {

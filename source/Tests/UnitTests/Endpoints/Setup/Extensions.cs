@@ -32,7 +32,14 @@ namespace Thinktecture.IdentityServer.Tests.Endpoints
         {
             foreach (var c in cookies)
             {
-                client.DefaultRequestHeaders.Add("Cookie", c);
+                if (c.Contains("2014"))
+                {
+                    Conformance.Extensions.RemoveCookie(client, c.Split('=').First());
+                }
+                else
+                {
+                    client.DefaultRequestHeaders.Add("Cookie", c);    
+                }
             }
         }
         public static void SetCookies(this HttpClient client, IEnumerable<CookieState> cookies)
